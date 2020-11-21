@@ -6,7 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 public class textClass {
-
+    
     /**
      * CONTRUCTOR POR DEFECTO
      */

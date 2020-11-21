@@ -7,6 +7,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+import lecXML.analicisLexico.analicisDeEstados;
+import lecXML.analicisLexico.characters.Caracter;
+import lecXML.analicisLexico.characters.ObtenerCarcateres;
 import lecXML.obtenerTexto.textClass;
 
 public class App 
@@ -25,9 +30,12 @@ public class App
         String texto="";
         
         texto = textClass1.obtenerTexto(data);
+        ObtenerCarcateres obtenerCarcateres = new ObtenerCarcateres();
+        List<Caracter> caracteres = obtenerCarcateres.obtenerCaracteres(texto);
+        analicisDeEstados analisis = new analicisDeEstados(caracteres);
         
-        System.out.println("Texto recuperado");
-        System.out.println(texto);
+        analisis.realizarAnalicis();
+        
         
     }
 }
