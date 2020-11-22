@@ -11,6 +11,8 @@ public class EstadoS4 {
         int ascii = caracter.getCodigoAscii();
         
         switch (ascii) {
+            case -1:
+                return analicisDeEstados.FIN;
             case 62:
                 return analicisDeEstados.ESTADO_5;
             case 9:

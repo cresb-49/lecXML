@@ -27,6 +27,7 @@ public class ObtenerCarcateres {
             }
             columna++;
         }
+        caracteres.add(new Caracter(linea, columna, "$", -1));
         return this.caracteres;
     }
 }

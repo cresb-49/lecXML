@@ -10,8 +10,9 @@ public class EstadoS7 {
     }
     public String transicion(Caracter caracter){
         int ascii = caracter.getCodigoAscii();
-        
-        if(lenguaje.letras(ascii)||lenguaje.numeros(ascii)||lenguaje.signos(ascii)){
+        if(ascii==-1){
+            return analicisDeEstados.FIN;
+        }else if(lenguaje.letras(ascii)||lenguaje.numeros(ascii)||lenguaje.signos(ascii)){
             return analicisDeEstados.ESTADO_7;
         }else if(ascii==95||ascii==45){
             // _,-,
@@ -23,7 +24,7 @@ public class EstadoS7 {
             // tabulador, nueva linea, espacio
             return analicisDeEstados.ESTADO_7;
         }else{
-            return "ERROR";
+            return analicisDeEstados.RESET;
         }
     }
 }
