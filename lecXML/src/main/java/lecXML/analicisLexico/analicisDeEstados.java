@@ -19,17 +19,24 @@ public class analicisDeEstados {
 
     public static final String RESET_IGNORE = "RESET_INGNORE";
     public static final String RESET = "RESET";
-    public static final String FIN ="FIN";
+    public static final String FIN = "FIN";
+    public static final String ERROR = "ERROR";
 
     private List<Caracter> caracteres = new ArrayList<>();
     private List<Token> Tokens = new ArrayList<>();
+    private List<ErrorLexico> errores = new ArrayList<>();
     // CONTROLADOR DE PEDIDA DE CARACTERES
     private int numeroCaracter = 0;
     private String tipoToken = "";
     private String buffer = "";
-    private String lexema="";
+    private String lexema = "";
+    //LINEA DE UBICACION DEL TOKEN ENCONTRADO
+    private int lineaToken = 0;
     // ESTADO DE ANALISIS DE LA MAQUINA DETERMINISTA
+    private String beforeState = "";
     private String currentState = this.ESTADO_0;
+    // VARAIBLE DE ALMACENAMIENTO DE NOMBRE DE TOKEN
+    private String nameToken = "";
     // ESTADOS DE LA MAQUINA FINITA DETERMINISTA
     private EstadoS0 s0 = new EstadoS0();
     private EstadoS1 s1 = new EstadoS1();
@@ -51,75 +58,111 @@ public class analicisDeEstados {
         Caracter caracter;
         while (numeroCaracter < caracteres.size()) {
             caracter = this.caracteres.get(numeroCaracter);
-            System.out.println("Caracter: "+caracter.getCaracter()+" Estado: "+currentState+" Lexema: "+buffer);
+            //System.out.println("Caracter: " + caracter.getCaracter() + " Estado: " + currentState + " Lexema: " + buffer);
             switch (this.currentState) {
                 case ESTADO_0:
-                    this.currentState=s0.transicion(caracter);
+                    this.beforeState = this.currentState;
+                    this.currentState = s0.transicion(caracter);
                     sumarCaracter(caracter);
+                    this.lineaToken = caracter.getLinea();
                     break;
                 case ESTADO_1:
-                    this.currentState=s1.transicion(caracter);
+                    this.beforeState = this.currentState;
+                    this.currentState = s1.transicion(caracter);
                     sumarCaracter(caracter);
                     break;
                 case ESTADO_2:
-                    this.currentState=s2.transicion(caracter);
+                    this.beforeState = this.currentState;
+                    this.currentState = s2.transicion(caracter);
                     sumarCaracter(caracter);
+                    if (!tipoToken.equals(Token.TOKEN_UNKNOWN)) {
+                        this.tipoToken = Token.TOKEN_TAG_END;
+                    }
                     break;
                 case ESTADO_3:
-                    this.currentState=s3.transicion(caracter);
+                    this.beforeState = this.currentState;
+                    this.currentState = s3.transicion(caracter);
                     sumarCaracter(caracter);
+                    if (!tipoToken.equals(Token.TOKEN_TAG_END) && !tipoToken.equals(Token.TOKEN_UNKNOWN)) {
+                        this.tipoToken = Token.TOKEN_TAG_INIT;
+                    }
                     break;
                 case ESTADO_4:
-                    this.currentState=s4.transicion(caracter);
+                    this.beforeState = this.currentState;
+                    this.currentState = s4.transicion(caracter);
                     sumarCaracter(caracter);
                     break;
                 case ESTADO_5:
-                    this.currentState=s5.transicion(caracter);
+                    this.beforeState = this.currentState;
+                    this.currentState = s5.transicion(caracter);
                     sumarCaracter(caracter);
                     break;
                 case ESTADO_6:
-                    this.currentState=s6.transicion(caracter);
+                    this.beforeState = this.currentState;
+                    this.currentState = s6.transicion(caracter);
                     sumarCaracter(caracter);
                     break;
                 case ESTADO_7:
-                    this.currentState=s7.transicion(caracter);
+                    this.beforeState = this.currentState;
+                    this.currentState = s7.transicion(caracter);
                     sumarCaracter(caracter);
+                    if (!tipoToken.equals(Token.TOKEN_UNKNOWN)) {
+                        this.tipoToken = Token.TOKEN_TEXT;
+                    }
                     break;
                 case RESET_IGNORE:
-                    currentState=ESTADO_0;
-                    buffer="";
+                    currentState = ESTADO_0;
+                    buffer = "";
                     break;
                 case RESET:
                     lexema = buffer;
-                    buffer="";
-                    Tokens.add(new Token(lexema, "tipo_NULL", 0));
-                    lexema="";
-                    this.currentState=ESTADO_0;
+                    buffer = "";
+                    Tokens.add(new Token(lexema, this.tipoToken, this.lineaToken));
+                    lexema = "";
+                    this.tipoToken = "";
+                    this.currentState = ESTADO_0;
                     break;
                 case FIN:
                     lexema = buffer;
-                    buffer="";
-                    System.out.println("Agrego el ultimo token con lexema: "+lexema);
-                    Tokens.add(new Token(lexema, "tipo_NULL", 0));
-                    lexema="";
-                    this.currentState=ESTADO_0;
-                    numeroCaracter=caracteres.size();
+                    buffer = "";
+                    Tokens.add(new Token(lexema, this.tipoToken, this.lineaToken));
+                    lexema = "";
+                    this.currentState = ESTADO_0;
+                    numeroCaracter = caracteres.size();
+                    break;
+                case "ERROR":
+                    Caracter temp = caracteres.get(numeroCaracter - 1);
+                    ErrorLexico error = new ErrorLexico(temp.getLinea(), temp.getColumna(), buffer);
+                    System.out.println(error.toString());
+                    errores.add(error);
+                    this.currentState = this.beforeState;
+                    this.tipoToken = Token.TOKEN_UNKNOWN;
                     break;
                 default:
                     break;
             }
-        }
-        System.out.println("Impresion de los token");
-        System.out.println("Tokens encontrados: "+Tokens.size());
-        for(Token token:Tokens){
-            System.out.println(token.toString());
-        }
-    }
-    private void sumarCaracter(Caracter caracter){
-        if(!(currentState.equals(RESET)||currentState.equals(RESET_IGNORE)||currentState.equals(FIN))){
-            buffer+=caracter.getCaracter();
-            numeroCaracter++;
+            //System.out.println("Siguiente estado: " + this.currentState);
         }
     }
 
+    private void sumarCaracter(Caracter caracter) {
+        if (!(currentState.equals(RESET) || currentState.equals(RESET_IGNORE) || currentState.equals(FIN))) {
+            buffer += caracter.getCaracter();
+            numeroCaracter++;
+        }
+    }
+    /**
+     * RETORNA LOS TOKENS ENCONTRADOS DEL ANALISIS LEXICO
+     * @return 
+     */
+    public List<Token> getTokens() {
+        return Tokens;
+    }
+    /**
+     * RETORNA LOS ERRORES LEXICOS ENCONTRADOS EN TEXTO
+     * @return 
+     */
+    public List<ErrorLexico> getErrores() {
+        return errores;
+    }
 }

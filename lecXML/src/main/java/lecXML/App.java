@@ -9,6 +9,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import lecXML.analicisLexico.ErrorLexico;
+import lecXML.analicisLexico.Token;
 import lecXML.analicisLexico.analicisDeEstados;
 import lecXML.analicisLexico.characters.Caracter;
 import lecXML.analicisLexico.characters.ObtenerCarcateres;
@@ -21,7 +23,7 @@ public class App
     {
         
         textClass textClass1 = new textClass();
-        File file = new File("/home/benjamin/Documentos/PROYECTOS_PERSONALES/ENTRADA.xml");
+        File file = new File("/home/benjamin/Documentos/PROYECTOS_PERSONALES/lecXML/ENTRADA.xml");
         InputStream data = new FileInputStream(file);
         System.out.println("Nombre: "+file.getName());
         System.out.println("Datos: "+file.getParent());
@@ -33,8 +35,23 @@ public class App
         ObtenerCarcateres obtenerCarcateres = new ObtenerCarcateres();
         List<Caracter> caracteres = obtenerCarcateres.obtenerCaracteres(texto);
         analicisDeEstados analisis = new analicisDeEstados(caracteres);
-        
         analisis.realizarAnalicis();
+        
+        List<Token> tokens = analisis.getTokens();
+        List<ErrorLexico> errores = analisis.getErrores();
+        
+        
+        System.out.println("Errores encontrados: "+errores.size());
+        for (ErrorLexico errore : errores) {
+            System.out.println(errore.toString());
+        }
+        if(errores.size()==0){
+            System.out.println("Tokens encontrados: "+tokens.size());
+            for (Token tok:tokens) {
+                System.out.println(tok.toString());
+            }
+        }
+        
         
         
     }

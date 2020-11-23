@@ -26,7 +26,7 @@ public class EstadoS0 {
             // _,-,/,&,=,"
             return analicisDeEstados.ESTADO_7;
         }else{
-            return analicisDeEstados.RESET_IGNORE;
+            return analicisDeEstados.ERROR;
         }
     }
 }
