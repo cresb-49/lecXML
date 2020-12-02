@@ -11,8 +11,7 @@ public class ObtenerCarcateres {
     }
 
     /**
-     * Se recibe texto en formato string y devuelve los caracteres que componene
-     * el String
+     * Se recibe una variable de tipo string con el texto de entrada del documento a analizar
      *
      * @param texto
      * @return
