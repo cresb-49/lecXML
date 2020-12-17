@@ -20,7 +20,7 @@ public class App
     {
         
         textClass textClass1 = new textClass();
-        File file = new File("/home/benjamin/Documentos/PROYECTOS_PERSONALES/lecXML/ENTRADA.xml");
+        File file = new File("C:\\Users\\carlo\\OneDrive\\Documentos\\PROGRAMACION JAVA\\lecXML\\ENTRADA (copia).xml");
         InputStream data = new FileInputStream(file);
         System.out.println("Nombre: "+file.getName());
         System.out.println("Datos: "+file.getParent());
